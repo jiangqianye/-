@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tiled ArcGIS MapServer</title>
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+
+</head>
+<style>
+    body {
+        /* background-color: black; */
+    }
+</style>
+
+<body>
+    账号：<input type="text" id='jqh1'>
+    密码：<input type="text" id='jqh2'>
+    <button onclick='aaa()'>验证</button>
+</body>
+
+
+
+<script>
+    function aaa() {
+        // -------------
+        const pwd = document.getElementById("jqh2").value;
+        const account = document.getElementById("jqh1").value;
+        // const pwd = "1234dcba5681/";
+        const pwdLength = pwd.length;
+        // const account = "name";
+        let grade = 0;
+
+        if (pwdLength < 8 || pwdLength > 24) {
+            console.log("密码8-24位:");
+            return; // 8-24
+        }
+
+        const accountArray = account ? account.split("") : [];
+        const result = accountArray.map(item => {
+            return pwd.indexOf(item);
+        });
+        console.log("result:", result);
+        const error = result.filter(item => {
+            return item === -1;
+        });
+        console.log("error:", error);
+        if (error.length === 0) {
+            console.log("密码不能包含用户名");
+            return; // 密码不能包含用户名
+        }
+
+        const str = pwd.toLowerCase();
+        console.log("str:", str);
+        const pwd_continuity = str.split("");
+        // for (let i = 1; i < arr.length - 2; i++) {
+        //   const firstIndex = arr[i - 1].charCodeAt(0);
+        //   const secondIndex = arr[i].charCodeAt(0);
+        //   const thirdIndex = arr[i + 1].charCodeAt(0);
+        //   const fourthIndex = arr[i + 2].charCodeAt(0);
+
+        //   const a = fourthIndex - thirdIndex;
+        //   const b = thirdIndex - secondIndex;
+        //   const c = secondIndex - firstIndex;
+
+        //   if (a == b && a == c) {
+        //     console.log("密码不能连续，不区分大小写:");
+        //     return;
+        //   }
+        // }
+        let pwd_continuity_count = 0;
+        let pwd_continuity_val;
+        for (let i = 1; i < pwd_continuity.length; i++) {
+            const continuity_msg =
+                pwd_continuity[i].charCodeAt(0) - pwd_continuity[i - 1].charCodeAt(0);
+            pwd_continuity_count =
+                continuity_msg === pwd_continuity_val ? pwd_continuity_count + 1 : 0;
+            pwd_continuity_val = continuity_msg;
+            if (pwd_continuity_count === 2) {
+                console.log("密码不能连续，不区分大小写:");
+                return;
+            }
+        }
+
+        // 长度校验
+        if (pwdLength < 17) {
+            grade += 10;
+            console.log("长度<17");
+        } else if (pwdLength > 16) {
+            grade += 25;
+            console.log("长度>16");
+        }
+        // 大小写校验
+        if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) {
+            console.log("大小写两种");
+            grade += 25;
+            if (/\d/.test(pwd) && /\W/.test(pwd)) {
+                console.log("奖励5");
+                grade += 5;
+            }
+        } else if (/[a-z]/.test(pwd) || /[A-Z]/.test(pwd)) {
+            console.log("大小写只有一种");
+            grade += 10;
+            if (/\d/.test(pwd) && /\W/.test(pwd)) {
+                console.log("奖励3");
+                grade += 3;
+            }
+        }
+
+        // 数字校验
+        const pwd_number_length = pwd.match(/[0-9]/g)
+            ? pwd.match(/[0-9]/g).length
+            : 0;
+
+        if (pwd_number_length === 1 || pwd_number_length === 2) {
+            grade += 10;
+            console.log("数字一两个");
+        } else if (pwd_number_length > 2) {
+            grade += 25;
+            console.log("数字大于2");
+        }
+
+        // 特殊字符
+        const pwd_w_length = pwd.match(/\W/g) ? pwd.match(/\W/g).length : 0;
+        if (pwd_w_length === 1) {
+            grade += 10;
+            console.log("特殊字符1个");
+        } else if (pwd_w_length > 1) {
+            grade += 20;
+            console.log("特殊字符两个");
+        }
+
+        console.log("grade:", grade);
+        if (grade < 25) {
+            console.log("强度-弱:");
+        } else if (grade < 60) {
+            console.log("强度-中:");
+        } else {
+            console.log("强度-强:");
+        }
+
+        // -------------
+
+    }
+
+</script>
+
+
+
+
+
+</html>
